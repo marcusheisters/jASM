@@ -1,8 +1,11 @@
 package main.java;
 
+import org.apache.commons.lang3.StringUtils;
+
 import javax.print.DocFlavor;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -11,34 +14,43 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
 
-        compile(args[0]);
+        String[] contents = compile(args[0]);
+        System.out.println(Arrays.toString(contents));
         // Read the file from the arguments
-        for (int i = 0; i < args.length; i++) {
-            System.out.println(args[i]);
-        }
+
     }
 
     private static String[] compile(String path) {
-        File file = path.StringUtils.substringAfterLast("/");
+
+        return readSourceFile(path);
+
+    }
+
+    private static String[] readSourceFile(String path) {
+        var fileName = new File(StringUtils.substringAfterLast(path, "/"));
+
         FileReader fileReader = null;
         try {
             fileReader = new FileReader(path);
         } catch (FileNotFoundException e) {
-            throw new RuntimeException("File at location $path not found", e);
+            throw new RuntimeException(String.format("File at location %s not found", path), e);
         }
         BufferedReader bufferedReader = new BufferedReader(fileReader);
         List<String> lines = new ArrayList<String>();
         String line = null;
         while (true) {
-            try {
-                if (!((line = bufferedReader.readLine()) != null)) break;
+            try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+                if ((line = bufferedReader.readLine()) == null) break;
             } catch (IOException e) {
-                throw new RuntimeException(String.format("Could not read file %s", )e);
+                throw new RuntimeException(String.format("Could not read file %s", fileName), e);
             }
-            lines.add(line);
+
+            // Commands are separated only by ';'
+            String[] keywords = line.split(";");
+            lines.addAll(Arrays.asList(keywords));
+
         }
-        bufferedReader.close();
-        return lines.toArray(new String[lines.size()]);
+        return lines.toArray(new String[0]);
     }
 
     ;
